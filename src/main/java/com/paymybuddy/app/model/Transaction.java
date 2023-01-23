@@ -23,4 +23,15 @@ public class Transaction {
     @JoinColumn(name = "typetransaction_id")
     private TypeTransaction typeTransaction;
 
+    @OneToOne
+    @JoinColumn(name = "compte_emetteur_id")
+    private Compte compteEmetteur;
+
+    @OneToOne
+    @JoinColumn(name = "compte_beneficiaire_id")
+    private Compte compteBeneficiaire;
+
+
+
+
 }

@@ -7,9 +7,9 @@ USE db_paymybuddy;
 CREATE TABLE IF NOT EXISTS `utilisateurs`
 (
     `id`               BIGINT NOT NULL AUTO_INCREMENT,
-    `nom`              VARCHAR(255),
-    `prenom`           VARCHAR(255),
-    `email`            VARCHAR(255),
+    `nom`              VARCHAR(50),
+    `prenom`           VARCHAR(50),
+    `email`            VARCHAR(100),
     `password`         VARCHAR(255),
     `date_inscription` DATE,
     `date_naissance`   DATE,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `utilisateurs`
 CREATE TABLE IF NOT EXISTS `roles`
 (
     `id`      BIGINT      NOT NULL AUTO_INCREMENT,
-    `libelle` VARCHAR(45) NOT NULL,
+    `libelle` VARCHAR(50) NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB;
 
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `comptes`
 CREATE TABLE IF NOT EXISTS `typestransaction`
 (
     `id`      BIGINT      NOT NULL AUTO_INCREMENT,
-    `libelle` VARCHAR(45) NOT NULL,
+    `libelle` VARCHAR(50) NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB;
 
@@ -59,10 +59,15 @@ CREATE TABLE IF NOT EXISTS `transactions`
 (
     `id`                 BIGINT  NOT NULL AUTO_INCREMENT,
     `montant`            NUMERIC NOT NULL DEFAULT 0,
-    `nom`                VARCHAR(255),
-    `typetransaction_id` BIGINT,
+    `description`                VARCHAR(255),
+    `typetransaction_id` BIGINT NOT NULL,
+    `compte_emetteur_id` BIGINT NOT NULL,
+    `compte_beneficiaire_id` BIGINT NOT NULL,
+
     PRIMARY KEY (id),
-    FOREIGN KEY (typetransaction_id) REFERENCES typestransaction (id)
+    FOREIGN KEY (typetransaction_id) REFERENCES typestransaction (id),
+    FOREIGN KEY (compte_emetteur_id) REFERENCES comptes (id),
+    FOREIGN KEY (compte_beneficiaire_id) REFERENCES comptes (id)
 ) ENGINE = InnoDB;
 
 
