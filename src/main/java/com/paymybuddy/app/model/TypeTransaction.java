@@ -15,7 +15,6 @@ public class TypeTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(nullable = false, length = 45)
     private String libelle;
 }
