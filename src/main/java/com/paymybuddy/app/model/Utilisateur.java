@@ -25,20 +25,14 @@ public class Utilisateur {
     private String password;
     private Date dateNaissance;
     private Date dateInscription;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "utilisateur")
     private List<Connection> connections;
-
     @ManyToMany( fetch = FetchType.EAGER)
     @JoinTable(
             name = "utilisateurs_roles",
             joinColumns = @JoinColumn(name = "utilisateur_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles = new HashSet<>();
-
-    public void ajouterRole(Role role) {
-        this.roles.add(role);
-    }
+    private List<Role> roles;
 
 }
