@@ -45,6 +45,12 @@ public class GeneralController {
         return "login";
     }
 
+    @GetMapping("/logout")
+    public String logoutPage(Model model){
+        return "login";
+    }
+
+
     @GetMapping("/register")
     public String getRegisterPage(Model model){
         return "register";
