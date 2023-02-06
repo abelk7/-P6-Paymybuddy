@@ -9,12 +9,117 @@
     <title>Profile</title>
 </head>
 <body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <div class="container-fluid">
     <div th:replace="fragments/header.html"/>
     <div class="container">
+        <div style="width: 500px;">
+            <div th:if="${error}" class="alert alert-warning d-flex align-items-center mt-3" role="alert">
+                <p th:text="${message}"></p>
+            </div>
+            <div th:if="${error} == false and ${success} == true" class="alert alert-success d-flex align-items-center mt-3" role="alert">
+                <p th:text="${message}"></p>
+            </div>
 
+
+<!--            <div  th:if="${differentPass}" class="alert alert-warning d-flex align-items-center mt-3" role="alert">-->
+<!--                <div>Les mots de passe sont différents.</div>-->
+<!--            </div>-->
+<!--            <div  th:if="${inferieurCaracterePass}" class="alert alert-warning d-flex align-items-center mt-3" role="alert">-->
+<!--                <div>Le mots de passe doit être supérieur à 8 caractère.</div>-->
+<!--            </div>-->
+<!--            <div th:if="${param.logout}" class="alert alert-success d-flex align-items-center mt-3" role="alert">-->
+<!--                <div>Les modifications on été enregistrés</div>-->
+<!--            </div>-->
+
+
+        <div class="card my-2 m-auto" style="width: 500px;">
+            <form class="m-auto p-3" th:action="@{/profile/modifier/user}" th:object="${utilisateurCourant}" method="post">
+                <div class="text-center">
+                    <img class="my-3" th:src="@{/images/user-profil.png}" width="120">
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="mb-3">
+                            <div class="form-text" id="labelPrenom">Prenom</div>
+                            <input class="form-control" aria-describedby="labelPrenom" id="inputPrenom"
+                                   th:field="*{prenom}"
+                                   th:value="${utilisateurCourant.getPrenom()}" disabled
+                                   type="text">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="mb-3">
+                            <div class="form-text" id="labelNom">Nom</div>
+                            <input class="form-control" aria-describedby="labelNom" id="inputNom"
+                                   th:field="*{nom}"
+                                   th:value="${utilisateurCourant.getNom()}" disabled
+                                   type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-text" id="labelEmail">Adresse mail</div>
+                    <input aria-describedby="labelEmail" class="form-control" id="inputEmail"
+                           th:field="*{email}"
+                           th:value="${utilisateurCourant.getEmail()}" th:disabled="${!modifier}"
+                           type="email">
+                </div>
+                <div class="mb-3" th:if="${modifier}">
+                    <div class="form-text" id="labelPassword" >Mot de passe</div>
+                    <div class="row">
+                        <div class="col-10">
+                            <input class="form-control" aria-describedby="labelPassword" id="inputPassword"
+                                   name="password"
+                                   th:field="*{password}"
+                                   th:disabled="${!modifier}" placeholder="********"
+                                   type="password">
+
+                        </div>
+                        <div class="col-2" th:if="${modifier && !modifierPass}">
+                            <a class="btn btn-success" th:href="@{/profile/modifier/password}"
+                                >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                                    <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                                </svg>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="mb-3" th:if="${modifier && modifierPass}">
+                    <div class="row">
+                        <div class="col-10">
+                            <div class="form-text" id="labelRepeatPassword">Confirmer le mot de passe</div>
+                            <input class="form-control" aria-describedby="labelPassword" id="inputRepeatPassword"
+                                   name="confirm_password"
+                                   th:field="*{passwordRepeat}"
+                                   value="" placeholder="********"
+                                   type="password">
+                        </div>
+                        <div class="col-2">
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="form-group mb-3">
+                    <label for="inputDateNaissance">Date de naissance</label>
+                    <input  class="form-control"  id="inputDateNaissance"
+                            th:value="${utilisateurCourant.getDateNaissance()}" disabled
+                            name="dateNaissance" type="date">
+                </div>
+                <div >
+
+                </div>
+                <a class="btn btn-success" th:href="@{/profile/modifier}" th:if="${modifier}==false">Modifier</a>
+                <button class="btn btn-success" type="submit" th:if="${modifier}">Enregistrer</button>
+            </form>
+        </div>
     </div>
 </div>
 <div th:replace="fragments/footer.html"/>
+
 </body>
 </html>

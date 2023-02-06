@@ -7,6 +7,7 @@ import com.paymybuddy.app.repository.UtilisateurRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +25,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -33,6 +36,11 @@ import java.util.Collection;
 public class SecurityConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
     private final UtilisateurRepository utilisateurRepository;
+
+    private HttpSession session;
+
+    @Autowired
+    private HttpServletRequest request;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         String[] staticResources = {
@@ -88,6 +96,8 @@ public class SecurityConfig {
                 for (Role role : utilisateur.getRoles()) {
                     authorities.add(new SimpleGrantedAuthority(role.getLibelle()));
                 }
+                //session.setAttribute("userEmail", utilisateur.getEmail());
+                //request.setAttribute("userEmail", utilisateur.getEmail());
 
                 return new User(utilisateur.getEmail(), utilisateur.getPassword(), authorities);
             }

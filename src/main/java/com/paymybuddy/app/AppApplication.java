@@ -13,6 +13,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @SpringBootApplication
@@ -26,6 +28,13 @@ public class AppApplication {
     @Bean
     public CommandLineRunner demo(UtilisateurRepository utilisateurRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         return (args) -> {
+            String pattern = "dd/mm/yyyy";
+            TimeZone tz  = TimeZone.getDefault(); //getting up local time zone
+            TimeZone.setDefault(TimeZone.getTimeZone("GMT+2"));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            simpleDateFormat.setTimeZone(tz);
+
+
             Role roleUser = new Role(1L, "USER");
             Role roleAdmin = new Role(2L, "ADMIN");
 
