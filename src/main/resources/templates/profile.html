@@ -44,7 +44,7 @@
                             <div class="form-text" id="labelPrenom">Prenom</div>
                             <input class="form-control" aria-describedby="labelPrenom" id="inputPrenom"
                                    th:field="*{prenom}"
-                                   th:value="${utilisateurCourant.getPrenom()}" disabled
+                                   th:value="${utilisateurCourant.getPrenom()}" th:disabled="${!modifier}"
                                    type="text">
                         </div>
                     </div>
@@ -53,7 +53,7 @@
                             <div class="form-text" id="labelNom">Nom</div>
                             <input class="form-control" aria-describedby="labelNom" id="inputNom"
                                    th:field="*{nom}"
-                                   th:value="${utilisateurCourant.getNom()}" disabled
+                                   th:value="${utilisateurCourant.getNom()}" th:disabled="${!modifier}"
                                    type="text">
                         </div>
                     </div>
@@ -65,14 +65,14 @@
                            th:value="${utilisateurCourant.getEmail()}" th:disabled="${!modifier}"
                            type="email">
                 </div>
-                <div class="mb-3" th:if="${modifier}">
+                <div class="mb-3" th:if="${modifier || !modifierPass}">
                     <div class="form-text" id="labelPassword" >Mot de passe</div>
                     <div class="row">
                         <div class="col-10">
                             <input class="form-control" aria-describedby="labelPassword" id="inputPassword"
                                    name="password"
                                    th:field="*{password}"
-                                   th:disabled="${!modifier}" placeholder="********"
+                                   th:disabled="${modifier && !modifierPass || !modifierPass}" placeholder="********"
                                    type="password">
 
                         </div>

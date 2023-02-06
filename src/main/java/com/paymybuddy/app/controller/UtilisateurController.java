@@ -14,91 +14,77 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UtilisateurController {
     private final IUtilisateurService utilisateurService;
+
     @GetMapping("/profile")
-    public String getProfilePage(Model model, Authentication authentication){
+    public String getProfilePage(Model model, Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        if(userDetails != null){
+        if (userDetails != null) {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
 
-            if(utilisateur != null){
-                UtilisateurDTO utilisateurDTO = new UtilisateurDTO(
-                        utilisateur.getPrenom(), utilisateur.getNom(), utilisateur.getEmail(),
-                        null,null,utilisateur.getDateNaissance()
-                );
-
-                model.addAttribute("utilisateurCourant", utilisateurDTO);
-                model.addAttribute("modifier", false);
-                model.addAttribute("modifierPass", false);
-                model.addAttribute("success", false);
-                model.addAttribute("error", false);
-                model.addAttribute("message", "");
+            if (utilisateur != null) {
+                UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
+                basicModelUserProfil(model, utilisateurDTO, false, false, false,false,null);
             }
         }
         return "profile";
     }
 
     @GetMapping("/profile/modifier")
-    public String getProfileModifier(Model model, Authentication authentication){
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    public String getProfileModifier(Model model, Authentication authentication) {
+        //return "redirect:/profile/modifier/password";
+        UserDetails userDetails = getUserDetails(authentication);
 
-        if(userDetails != null){
+        if (userDetails != null) {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
-            if(utilisateur != null){
-                UtilisateurDTO utilisateurDTO = new UtilisateurDTO(
-                        utilisateur.getPrenom(), utilisateur.getNom(), utilisateur.getEmail(),
-                        null,null,utilisateur.getDateNaissance()
-                );
-                model.addAttribute("utilisateurCourant", utilisateurDTO);
-                model.addAttribute("modifier", true);
-                model.addAttribute("modifierPass", false);                model.addAttribute("success", false);
-                model.addAttribute("success", false);
-                model.addAttribute("error", false);
-                model.addAttribute("message", "");
+            if (utilisateur != null) {
+                UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
+                basicModelUserProfil(model, utilisateurDTO, true, false, false,false,null);
             }
         }
         return "profile";
     }
 
     @GetMapping("/profile/modifier/password")
-    public String getProfileModifierPassword(Model model, Authentication authentication){
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    public String getProfileModifierPassword(Model model, Authentication authentication) {
+        UserDetails userDetails = getUserDetails(authentication);
 
-        if(userDetails != null){
+        if (userDetails != null) {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
-            if(utilisateur != null){
-                UtilisateurDTO utilisateurDTO = new UtilisateurDTO(
-                        utilisateur.getPrenom(), utilisateur.getNom(), utilisateur.getEmail(),
-                        null,null,utilisateur.getDateNaissance()
-                );
-                model.addAttribute("utilisateurCourant", utilisateurDTO);
-                model.addAttribute("modifier", true);
-                model.addAttribute("modifierPass", true);
-                model.addAttribute("success", false);
-                model.addAttribute("error", false);
-                model.addAttribute("message", "");
+            if (utilisateur != null) {
+                UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
+                basicModelUserProfil(model, utilisateurDTO, true, true, false,false,null);
             }
         }
         return "profile";
     }
 
 
-    @RequestMapping(value = "/profile/modifier/user", method= RequestMethod.POST)
-    public String postModifierUtilisateur(@ModelAttribute(value="utilisateurCourant") UtilisateurDTO utilisateur,Model model, Authentication authentication){
+
+    @RequestMapping(value = "/profile/modifier/user", method = RequestMethod.POST)
+    public String postModifierUtilisateur(@ModelAttribute(value = "utilisateurCourant") UtilisateurDTO utilisateur, Model model, Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
+        Utilisateur utilisateurRechercher = null;
         boolean changedPassword = false;
 
-        UtilisateurDTO utilisateurDTO = new UtilisateurDTO(
-                utilisateur.getPrenom(), utilisateur.getNom(), utilisateur.getEmail(),
-                null,null,utilisateur.getDateNaissance()
-        );
+        if (userDetails != null) {
+            utilisateurRechercher = utilisateurService.getUser(userDetails.getUsername());
+            if (utilisateurRechercher != null) {
+                utilisateurDTO.setNom(utilisateurRechercher.getNom());
+                utilisateurDTO.setPrenom(utilisateurRechercher.getPrenom());
+                utilisateurDTO.setDateNaissance(utilisateur.getDateNaissance());
+
+            }
+        }
+
 
         //TODO : Vérifier le changement de chaque champs indivielllement....
-        if(utilisateur.getPasswordRepeat() != null){
-            if(utilisateur.getPassword().length() >= 8){
-                if(utilisateur.getPassword().equals(utilisateur.getPasswordRepeat())){
+        if (utilisateur.getPassword() != null && utilisateur.getPasswordRepeat() != null) {
+            if (utilisateur.getPassword().length() >= 8) {
+                if (utilisateur.getPassword().equals(utilisateur.getPasswordRepeat())) {
                     changedPassword = true;
-                }else{
+                } else {
                     //Les mots de passe ne corresponds pas
                     model.addAttribute("utilisateurCourant", utilisateurDTO);
                     model.addAttribute("modifier", true);
@@ -109,7 +95,7 @@ public class UtilisateurController {
                     return "profile";
                 }
 
-            }else {
+            } else {
                 //Password inférieur à 8 caractère
                 model.addAttribute("utilisateurCourant", utilisateurDTO);
                 model.addAttribute("modifier", true);
@@ -122,47 +108,74 @@ public class UtilisateurController {
 
         }
 
-        if(userDetails != null ){
-            Utilisateur utilisateurRechercher = utilisateurService.getUser(userDetails.getUsername());
-            if(utilisateur.getEmail() != null || !utilisateur.getEmail().equals("") && utilisateur.getEmail().contains("@")){
 
-                if(utilisateurRechercher != null){
-                    if(passwordConfirmer(utilisateur.getPassword(),utilisateur.getPasswordRepeat())){
-                        Utilisateur utilisateurAEnregistrer = utilisateurService.getUser(userDetails.getUsername());
-                        utilisateurAEnregistrer.setEmail(utilisateur.getEmail());
-                        utilisateurAEnregistrer.setPassword(utilisateur.getPassword());
-                        Utilisateur u = utilisateurService.saveUser(utilisateurAEnregistrer);
-
-                         utilisateurDTO = new UtilisateurDTO(
-                                utilisateur.getPrenom(), u.getNom(), u.getEmail(),
-                                null,null,u.getDateNaissance()
-                        );
-                        model.addAttribute("utilisateurCourant", utilisateurDTO);
-                        model.addAttribute("modifier", true);
-                        model.addAttribute("modifierPass", false);
-                        model.addAttribute("utilisateurEnregistrer", false);
-                        model.addAttribute("error", false);
-                        model.addAttribute("success", true);
-                        model.addAttribute("message", "Les modifications ont été enregistrés");
-                        return "profile";
-                    }
-                }
-            }else {
-
-                model.addAttribute("utilisateurCourant", utilisateurDTO);
-                model.addAttribute("modifier", true);
-                model.addAttribute("modifierPass", false);
-                model.addAttribute("success", false);
-                model.addAttribute("error", true);
-                model.addAttribute("message", "....");
-
-            }
+        if (utilisateur.getEmail() == null || utilisateur.getEmail().equals("") && !utilisateur.getEmail().contains("@")) {
+            model.addAttribute("utilisateurCourant", utilisateurDTO);
+            model.addAttribute("modifier", true);
+            model.addAttribute("modifierPass", false);
+            model.addAttribute("success", false);
+            model.addAttribute("error", true);
+            model.addAttribute("message", "L'addresse email n'est pas valide");
+            return "profile";
         }
-        model.addAttribute("modifier", true);
-        return "profile";
+
+        //TODO
+        if (utilisateurRechercher != null) {
+
+            Utilisateur utilisateurAEnregistrer = utilisateurService.getUser(userDetails.getUsername());
+            if (!utilisateur.getEmail().equals(utilisateurAEnregistrer.getPrenom())) {
+                utilisateurAEnregistrer.setEmail(utilisateur.getEmail());
+            }
+
+            if (!utilisateur.getPrenom().equals(utilisateurAEnregistrer.getPrenom())) {
+                utilisateurAEnregistrer.setPrenom(utilisateur.getPrenom());
+            }
+            if (!utilisateur.getNom().equals(utilisateurAEnregistrer.getNom())) {
+                utilisateurAEnregistrer.setNom(utilisateurAEnregistrer.getNom());
+            }
+
+            if (passwordConfirmer(utilisateur.getPassword(), utilisateur.getPasswordRepeat()) && !utilisateur.getPassword().equals("")) {
+                utilisateurAEnregistrer.setPassword(utilisateur.getPassword());
+            } else {
+                utilisateurAEnregistrer.setPassword(utilisateurAEnregistrer.getPassword());
+            }
+
+            Utilisateur u = utilisateurService.saveUser(utilisateurAEnregistrer);
+
+            utilisateurDTO = new UtilisateurDTO(utilisateur.getPrenom(), u.getNom(), u.getEmail(), null, null, u.getDateNaissance());
+            return "redirect:/logout";
+        } else {
+            model.addAttribute("utilisateurCourant", utilisateurDTO);
+            model.addAttribute("modifier", true);
+            model.addAttribute("modifierPass", false);
+            model.addAttribute("success", false);
+            model.addAttribute("error", true);
+            model.addAttribute("message", "Aucun données concernant l'utilisateur saisie...");
+            return "profile";
+        }
+
     }
 
-    private boolean passwordConfirmer(String password, String confirm){
-        return password.equals(confirm);
+    private boolean passwordConfirmer(String password, String confirm) {
+        if(password != null && confirm != null) {
+            return password.equals(confirm);
+        }
+        return false;
+    }
+
+    public Model basicModelUserProfil(Model model,UtilisateurDTO utilisateurCourant, boolean modifier, boolean modifierPass,
+                                      boolean success, boolean error, String message) {
+        model.addAttribute("utilisateurCourant", utilisateurCourant);
+        model.addAttribute("modifier", modifier);
+        model.addAttribute("modifierPass", modifierPass);
+        model.addAttribute("success", success);
+        model.addAttribute("error", error);
+        model.addAttribute("message", message);
+
+        return model;
+    }
+
+    private UserDetails getUserDetails( Authentication authentication) {
+        return (UserDetails) authentication.getPrincipal();
     }
 }
