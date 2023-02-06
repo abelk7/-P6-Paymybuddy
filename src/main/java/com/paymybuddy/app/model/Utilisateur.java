@@ -23,7 +23,9 @@ public class Utilisateur {
     private String prenom;
     private String email;
     private String password;
+    @Temporal(TemporalType.DATE)
     private Date dateNaissance;
+    @Temporal(TemporalType.DATE)
     private Date dateInscription;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "utilisateur")
     private List<Connection> connections;

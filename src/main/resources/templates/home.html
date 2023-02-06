@@ -13,7 +13,7 @@
     <div sec:authorize="isAuthenticated()">
         <div th:replace="fragments/header.html"/>
         <div class="text-center mt-2">
-            <h3>Bienvenue</h3>
+            <h3>Bienvenue <span th:text="${utilisateurCourant.getPrenom()}" class="text-warning">title</span></h3>
         </div>
     </div>
     <div class="container">
