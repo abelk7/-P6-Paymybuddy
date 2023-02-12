@@ -21,7 +21,7 @@ public class UtilisateurService implements IUtilisateurService {
     private final PasswordEncoder passwordEncoder;
     @Override
     public Utilisateur getUser(String email) {
-        LOG.info("Recherche de l'lutilisateur avec l'email : {}", email);
+
         return utilisateurRepository.findByEmail(email);
     }
     @Override

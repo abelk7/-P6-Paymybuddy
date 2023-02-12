@@ -20,5 +20,4 @@ public class Compte {
     @OneToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "utilisateur_id")
     private Utilisateur utilisateur;
-
 }

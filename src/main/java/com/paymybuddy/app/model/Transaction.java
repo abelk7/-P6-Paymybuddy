@@ -27,8 +27,4 @@ public class Transaction {
     @OneToOne
     @JoinColumn(name = "compte_beneficiaire_id")
     private Compte compteBeneficiaire;
-
-
-
-
 }

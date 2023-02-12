@@ -21,5 +21,4 @@ public class Connection {
     @JoinColumn(name = "connection_utilisateur_id")
     @ManyToOne(cascade = CascadeType.ALL)
     private Utilisateur connectionUtilisateur;
-
 }

@@ -2,10 +2,11 @@ package com.paymybuddy.app.it;
 
 import com.paymybuddy.app.model.Role;
 import com.paymybuddy.app.model.Utilisateur;
+import com.paymybuddy.app.service.IRoleService;
 import com.paymybuddy.app.service.IUtilisateurService;
 import org.junit.Before;
-import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.*;
+import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,38 +15,47 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
-@RunWith(SpringRunner.class)
+@RunWith(JUnitPlatform.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UtilisateurServiceTestIT {
 
     @Autowired
-    IUtilisateurService utilisateurService;
+    private IUtilisateurService utilisateurService;
+    @Autowired
+    private IRoleService roleService;
 
     @DisplayName("Fetching user in database")
+    @Order(1)
     @Test
-    public void testGetUser() throws Exception {
+    void testGetUser() {
         Utilisateur utilisateur = utilisateurService.getUser("user@user.com");
         assertThat(utilisateur).isNotNull();
     }
 
     @DisplayName("Fetching unexist user in database")
+    @Order(2)
     @Test
-    public void testGetUserUnexistUser() throws Exception {
+    void testGetUserUnexistUser() {
         Utilisateur utilisateur = utilisateurService.getUser("user123@user.com");
         assertThat(utilisateur).isNull();
     }
 
     @DisplayName("Saving new user user")
+    @Order(3)
     @Test
-    public void testSaveNewUser() {
-        List<Role> roleListUser= new ArrayList<>();
+    void testSaveNewUser() {
+        List<Role> roleListUser = new ArrayList<>();
         Role roleUser = new Role(1L, "USER");
         roleListUser.add(roleUser);
 
@@ -64,16 +74,22 @@ public class UtilisateurServiceTestIT {
     }
 
     @DisplayName("Saving user")
+    @Order(4)
     @Test
-    public void testSaveUser() {
-        Utilisateur utilisateur = utilisateurService.getUser("user@user.com");
-        utilisateur.setNom("newNomTest");
-        utilisateur.setPrenom("newPrenomTest");
-        utilisateur.setEmail("user123@user.com");
+    void testSaveUser() {
+        Utilisateur utilisateur1 = utilisateurService.getUser("user2@user.com");
 
-        Utilisateur utilisateurSaved = utilisateurService.save(utilisateur);
+        utilisateur1.setNom("userNomTest2");
+        utilisateur1.setPrenom("userPrenomTest2");
+        utilisateur1.setEmail("usertest2@user.com");
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        LocalDate dateNaissance = LocalDate.of(2004, 01, 02);
+        LocalDate dateInscription = LocalDate.of(2022, 06, 26);
+        utilisateur1.setDateInscription(Date.from(dateInscription.atStartOfDay(defaultZoneId).toInstant()));
+        utilisateur1.setDateNaissance(Date.from(dateNaissance.atStartOfDay(defaultZoneId).toInstant()));
+
+        Utilisateur utilisateurSaved = utilisateurService.save(utilisateur1);
 
         assertThat(utilisateurSaved).isNotNull();
     }
-
 }

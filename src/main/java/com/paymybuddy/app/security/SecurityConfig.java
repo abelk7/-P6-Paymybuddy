@@ -43,12 +43,6 @@ public class SecurityConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
     private final UtilisateurRepository utilisateurRepository;
 
-    private final HttpServletResponse httpServletResponse;
-
-    private HttpSession session;
-
-    @Autowired
-    private HttpServletRequest request;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         String[] staticResources = {
@@ -59,7 +53,8 @@ public class SecurityConfig {
         };
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .antMatchers("/", "/home", "/register", "/register/user").permitAll()
+                        .antMatchers("/", "/home", "/login", "/register", "/register/user").permitAll()
+                        .antMatchers("/profile", "/profile/modifier", "/profile/modifier/password", "/profile/modifier/user").hasAnyRole("USER", "ADMIN")
                         .antMatchers(staticResources).permitAll()
                         .anyRequest().authenticated()
                         .and()
@@ -81,6 +76,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
     /**
      * @return UserDetailsService
      */
@@ -111,6 +107,7 @@ public class SecurityConfig {
             }
         };
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -118,10 +115,12 @@ public class SecurityConfig {
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

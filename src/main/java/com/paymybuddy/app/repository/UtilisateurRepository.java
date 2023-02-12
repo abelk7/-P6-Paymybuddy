@@ -9,14 +9,4 @@ import java.util.Date;
 
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
     Utilisateur findByEmail(String email);
-
-//     @Query(value = "INSERT INTO utilisateurs (id, date_inscription, " +
-//             "date_naissance, email, nom, password, prenom) values " +
-//             "(null, : dateInscription, : dateNaissance, : email, : nom, : password, : prenom",nativeQuery = true)
-//    Utilisateur save(@Param("dateInscription") Date dateInscription,
-//                     @Param("dateNaissance") Date  dateNaissance,
-//                     @Param("email") String email,
-//                     @Param("nom") String nom,
-//                     @Param("password") String password,
-//                     @Param("prenom") String prenom);
 }
