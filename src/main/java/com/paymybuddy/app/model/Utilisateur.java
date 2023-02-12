@@ -3,6 +3,7 @@ package com.paymybuddy.app.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -24,6 +25,7 @@ public class Utilisateur {
     private String email;
     private String password;
     @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern="yyyy-mm-dd")
     private Date dateNaissance;
     @Temporal(TemporalType.DATE)
     private Date dateInscription;

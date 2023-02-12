@@ -4,6 +4,7 @@ import com.paymybuddy.app.model.Role;
 import com.paymybuddy.app.model.Utilisateur;
 import com.paymybuddy.app.repository.RoleRepository;
 import com.paymybuddy.app.repository.UtilisateurRepository;
+import com.paymybuddy.app.service.IUtilisateurService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class AppApplication {
         SpringApplication.run(AppApplication.class, args);
     }
     @Bean
-    public CommandLineRunner demo(UtilisateurRepository utilisateurRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner demo(UtilisateurRepository utilisateurRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, IUtilisateurService utilisateurService) {
         return (args) -> {
             String pattern = "dd/mm/yyyy";
             TimeZone tz  = TimeZone.getDefault(); //getting up local time zone
@@ -52,7 +53,7 @@ public class AppApplication {
             utilisateur1.setPrenom("userPrenom");
             utilisateur1.setEmail("user@user.com");
             utilisateur1.setRoles(roleListUser);
-            utilisateur1.setPassword(passwordEncoder.encode("123456789"));
+            utilisateur1.setPassword("123456789");
             utilisateur1.setDateInscription(new Date());
             utilisateur1.setDateNaissance(new Date());
 
@@ -61,7 +62,7 @@ public class AppApplication {
             utilisateur2.setPrenom("adminPrenom");
             utilisateur2.setEmail("admin@admin.com");
             utilisateur2.setRoles(roleListAdmin);
-            utilisateur2.setPassword(passwordEncoder.encode("123456789"));
+            utilisateur2.setPassword("123456789");
             utilisateur2.setDateInscription(new Date());
             utilisateur2.setDateNaissance(new Date());
 
@@ -77,10 +78,10 @@ public class AppApplication {
 
             LOGGER.info("Generate utilisateur1 ({}) with role{} pass: {}",
                     utilisateur1.getEmail(), roleUtilisateur1, "123456789");
-            utilisateurRepository.save(utilisateur1);
+            utilisateurService.saveUser(utilisateur1);
             LOGGER.info("Generate utilisateur2 ({}) with role{} pass: {}",
                     utilisateur2.getEmail(), roleUtilisateur2, "123456789");
-            utilisateurRepository.save(utilisateur2);
+            utilisateurService.saveUser(utilisateur2);
         };
     }
 

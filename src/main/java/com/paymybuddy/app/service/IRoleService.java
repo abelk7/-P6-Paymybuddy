@@ -1,5 +1,13 @@
 package com.paymybuddy.app.service;
 
-public interface IRoleService {
+import com.paymybuddy.app.model.Role;
 
+import java.util.List;
+
+public interface IRoleService {
+    List<Role> getAllRoles();
+
+    Role getRoleUser();
+
+    Role getRoleAdmin();
 }

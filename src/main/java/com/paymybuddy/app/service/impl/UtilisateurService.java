@@ -26,8 +26,14 @@ public class UtilisateurService implements IUtilisateurService {
     }
     @Override
     public Utilisateur saveUser(Utilisateur utilisateur) {
-        LOG.info("Enregistrement de l'utilisateur {} {} dans la base de donnée", utilisateur.getPrenom(), utilisateur.getNom());
+        LOG.info("Enregistrement d'un nouveau utilisateur {} {} dans la base de donnée", utilisateur.getPrenom(), utilisateur.getNom());
         utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
+        return utilisateurRepository.save(utilisateur);
+    }
+
+    @Override
+    public Utilisateur save(Utilisateur utilisateur) {
+        LOG.info("Enregistrement de l'utilisateur {} {} dans la base de donnée", utilisateur.getPrenom(), utilisateur.getNom());
         return utilisateurRepository.save(utilisateur);
     }
 }
