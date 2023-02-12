@@ -1,40 +1,34 @@
 package com.paymybuddy.app.it;
 
 import com.paymybuddy.app.payload.UtilisateurDTO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
+import com.paymybuddy.app.service.IUtilisateurService;
+import org.junit.jupiter.api.*;
+import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+
 import java.util.Date;
 
-import static org.junit.Assert.assertThrows;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.web.servlet.function.RequestPredicates.param;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@RunWith(JUnitPlatform.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class GeneralControllerTestIT {
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class RegisterControllerTestIT {
     @Autowired
     private WebApplicationContext context;
     private MockMvc mockMvc;
 
-    @Before
+    @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
@@ -42,83 +36,18 @@ public class GeneralControllerTestIT {
                 .build();
     }
 
-    @DisplayName("Tentative d'acceder à la page racine par defaut")
+    @DisplayName("Tentative d'acceder à la page register")
+    @Order(1)
     @Test
-    public void testGetIndexPage() throws Exception {
-        mockMvc.perform(get("/"))
-                .andExpect(status().isOk());
-    }
-
-    @DisplayName("Tentative d'acceder à la page home sans s'être connecter")
-    @Test
-    public void testGetIndexHomePageWithoutLogged() throws Exception {
-        mockMvc.perform(get("/home"))
-                .andExpect(model().attributeDoesNotExist("utilisateurCourant"))
-                .andExpect(status().isOk());
-    }
-
-    @DisplayName("Tentative d'acceder à la page home avec un compte utilisateur connecté")
-    @WithMockUser(username = "user@user.com")
-    @Test
-    public void testGetIndexHomePageWithLoggedUser() throws Exception {
-        mockMvc.perform(get("/home"))
-                .andExpect(model().attributeExists("utilisateurCourant"))
-                .andExpect(status().isOk());
-    }
-
-    /******Test Login*********/
-
-    @DisplayName("Tentative d'acceder à la page login")
-    @Test
-    public void testGetLoginPage() throws Exception {
-        mockMvc.perform(get("/login"))
-                .andExpect(status().isOk());
-    }
-
-    @DisplayName("Connexion avec un utilisateur inscrit")
-    @Test
-    public void testLogin() throws Exception {
-        RequestBuilder requestBuilder = formLogin().user("user@user.com").password("123456789");
-        mockMvc.perform(requestBuilder)
-                .andExpect(redirectedUrl("/home"))
-                .andExpect(status().isFound());
-
-    }
-
-    @DisplayName("Connexion avec un compte qui n'existe pas en bdd")
-    @Test/*(expected = UsernameNotFoundException.class)*/
-    public void testLoginWithUnexistUser() throws Exception, UsernameNotFoundException {
-        RequestBuilder requestBuilder = formLogin().user("asley@user.com").password("123456789");
-        // TODO : TEST CONNNEXION, UsernameNotFoundException not Thrown
-        Exception exception = assertThrows(UsernameNotFoundException.class, () -> {
-            mockMvc.perform(requestBuilder)
-                    .andExpect(redirectedUrl("/login?error"));
-        });
-
-//                .andExpect(result -> assertTrue(result.getResolvedException() instanceof UsernameNotFoundException));
-    }
-
-    @DisplayName("Deconnexion avec un utilisateur inscrit")
-    @WithMockUser(username = "user@user.com",roles = "USER", password = "123456789")
-    @Test
-    public void testLogout() throws Exception {
-        mockMvc.perform(post("/logout"))
-                .andExpect(redirectedUrl("/login"))
-                .andExpect(status().isFound());
-    }
-
-    /******Test Register *********/
-
-    @DisplayName("Tentative d'acceder à ma page register")
-    @Test
-    public void testGetRegisterPage() throws Exception {
+    void testGetRegisterPage() throws Exception {
         mockMvc.perform(get("/register"))
                 .andExpect(status().isOk());
     }
 
     @DisplayName("Tentative d'inscrire un utilisateur avec informations correct")
+    @Order(2)
     @Test
-    public void testRegisterUserWithValidInformation() throws Exception {
+    void testRegisterUserWithValidInformation() throws Exception {
         UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
         utilisateurDTO.setPrenom("Alain");
         utilisateurDTO.setNom("Fouquet");
@@ -131,8 +60,9 @@ public class GeneralControllerTestIT {
     }
 
     @DisplayName("Tentative d'inscrire un utilisateur avec champ prenom incorrect")
+    @Order(3)
     @Test
-    public void testRegisterUserWithInvalidPrenom() throws Exception {
+    void testRegisterUserWithInvalidPrenom() throws Exception {
 
         UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
         utilisateurDTO.setPrenom("");
@@ -147,8 +77,9 @@ public class GeneralControllerTestIT {
     }
 
     @DisplayName("Tentative d'inscrire un utilisateur avec champ nom incorrect")
+    @Order(4)
     @Test
-    public void testRegisterUserWithInvalidNom() throws Exception {
+    void testRegisterUserWithInvalidNom() throws Exception {
 
         UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
         utilisateurDTO.setPrenom("Marc");
@@ -163,8 +94,9 @@ public class GeneralControllerTestIT {
     }
 
     @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @Order(5)
     @Test
-    public void testRegisterUserWithInvalidEmail() throws Exception {
+    void testRegisterUserWithInvalidEmail() throws Exception {
 
         UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
         utilisateurDTO.setPrenom("Marc");
@@ -179,8 +111,9 @@ public class GeneralControllerTestIT {
     }
 
     @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @Order(6)
     @Test
-    public void testRegisterUserWithInvalidPassword() throws Exception {
+    void testRegisterUserWithInvalidPassword() throws Exception {
 
         UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
         utilisateurDTO.setPrenom("Marc");
@@ -195,8 +128,9 @@ public class GeneralControllerTestIT {
     }
 
     @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @Order(7)
     @Test
-    public void testRegisterUserWithInvalidPasswordLength() throws Exception {
+    void testRegisterUserWithInvalidPasswordLength() throws Exception {
 
         UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
         utilisateurDTO.setPrenom("Marc");
@@ -211,8 +145,9 @@ public class GeneralControllerTestIT {
     }
 
     @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @Order(8)
     @Test
-    public void testRegisterUserWithInvalidRepeatPassword() throws Exception {
+    void testRegisterUserWithInvalidRepeatPassword() throws Exception {
 
         UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
         utilisateurDTO.setPrenom("Marc");
@@ -227,8 +162,9 @@ public class GeneralControllerTestIT {
     }
 
     @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @Order(9)
     @Test
-    public void testRegisterUserWithInvalidDateNaissance() throws Exception {
+    void testRegisterUserWithInvalidDateNaissance() throws Exception {
 
         UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
         utilisateurDTO.setPrenom("Marc");

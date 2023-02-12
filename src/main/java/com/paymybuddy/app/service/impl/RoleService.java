@@ -21,16 +21,19 @@ public class RoleService implements IRoleService {
 
     @Override
     public List<Role> getAllRoles() {
+        LOG.info("Fetching all roles in database");
         return roleRepository.findAll();
     }
 
     @Override
     public Role getRoleUser() {
+        LOG.info("Fetching role USER");
         return roleRepository.getRoleUser();
     }
 
     @Override
     public Role getRoleAdmin() {
+        LOG.info("Fetching role ADMIN");
         return roleRepository.getRoleAdmin();
     }
 }

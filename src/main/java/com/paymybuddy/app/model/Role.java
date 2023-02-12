@@ -17,5 +17,4 @@ public class Role {
     private Long id;
     @Column(nullable = false, length = 45)
     private String libelle;
-
 }

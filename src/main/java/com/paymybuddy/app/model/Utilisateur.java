@@ -15,7 +15,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="utilisateurs")
+@Table(name = "utilisateurs")
 public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,18 +25,17 @@ public class Utilisateur {
     private String email;
     private String password;
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern="yyyy-mm-dd")
+    @DateTimeFormat(pattern = "yyyy-mm-dd")
     private Date dateNaissance;
     @Temporal(TemporalType.DATE)
     private Date dateInscription;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "utilisateur")
     private List<Connection> connections;
-    @ManyToMany( fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "utilisateurs_roles",
             joinColumns = @JoinColumn(name = "utilisateur_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<Role> roles;
-
 }

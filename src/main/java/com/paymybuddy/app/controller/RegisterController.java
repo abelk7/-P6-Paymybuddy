@@ -1,5 +1,6 @@
 package com.paymybuddy.app.controller;
 
+import com.google.common.base.Strings;
 import com.paymybuddy.app.model.Role;
 import com.paymybuddy.app.model.Utilisateur;
 import com.paymybuddy.app.payload.UtilisateurDTO;
@@ -7,66 +8,20 @@ import com.paymybuddy.app.service.IRoleService;
 import com.paymybuddy.app.service.IUtilisateurService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import com.google.common.base.Strings;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * General controller for
- * - login
- * - register
- * - home
- * requests
- */
 @Controller
 @RequiredArgsConstructor
-public class GeneralController {
+public class RegisterController {
     private final IUtilisateurService utilisateurService;
     private final IRoleService roleService;
-
-    @GetMapping("/")
-    public String getIndexPage(Model model) {
-        return "home";
-    }
-
-    @GetMapping("/home")
-    @ResponseStatus(code = HttpStatus.OK)
-    public String getHomePage(Model model, Authentication authentication) {
-        UserDetails userDetails = null;
-
-        if(authentication != null)
-            userDetails = (UserDetails) authentication.getPrincipal();
-
-        if (userDetails != null) {
-            Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
-            if (utilisateur != null) {
-                utilisateur.setPassword(null);
-                model.addAttribute("utilisateurCourant", utilisateur);
-            }
-        }
-        return "home";
-    }
-
-    @GetMapping("/login")
-    @ResponseStatus(code = HttpStatus.OK)
-    public String getLoginPage(Model model) {
-        return "login";
-    }
-
-    @GetMapping("/logout")
-    @ResponseStatus(code = HttpStatus.OK)
-    public String logoutPage(Model model) {
-        return "login";
-    }
-
 
     @GetMapping("/register")
     @ResponseStatus(code = HttpStatus.OK)
@@ -101,7 +56,7 @@ public class GeneralController {
                 modelRegistrationError(model, "Le mot de passe n'est pas valide", utilisateur);
                 return "register";
             }
-            if(!Strings.isNullOrEmpty(utilisateur.getPassword()) && utilisateur.getPassword().length() < 8) {
+            if (!Strings.isNullOrEmpty(utilisateur.getPassword()) && utilisateur.getPassword().length() < 8) {
                 modelRegistrationError(model, "Votre mot de passe doit comporter plus de 8 caractères", utilisateur);
                 return "register";
             }
@@ -116,8 +71,8 @@ public class GeneralController {
 
             List<Role> newUserRole = new ArrayList<>();
 
-            for (Role role: rolesList) {
-                if (role.getLibelle().equals("USER")){
+            for (Role role : rolesList) {
+                if (role.getLibelle().equals("USER")) {
                     newUserRole.add(role);
                     break;
                 }
@@ -148,5 +103,4 @@ public class GeneralController {
         model.addAttribute("utilisateur", utilisateur);
         return model;
     }
-
 }

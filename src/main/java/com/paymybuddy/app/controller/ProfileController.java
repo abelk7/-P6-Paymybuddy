@@ -4,18 +4,25 @@ import com.paymybuddy.app.model.Utilisateur;
 import com.paymybuddy.app.payload.UtilisateurDTO;
 import com.paymybuddy.app.service.IUtilisateurService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.util.Date;
+
 @Controller
 @RequiredArgsConstructor
-public class UtilisateurController {
+public class ProfileController {
     private final IUtilisateurService utilisateurService;
 
     @GetMapping("/profile")
+    @ResponseStatus(code = HttpStatus.OK)
     public String getProfilePage(Model model, Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
@@ -24,28 +31,29 @@ public class UtilisateurController {
 
             if (utilisateur != null) {
                 UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
-                basicModelUserProfil(model, utilisateurDTO, false, false, false,false,null);
+                basicModelUserProfil(model, utilisateurDTO, false, false, false, false, null);
             }
         }
         return "profile";
     }
 
     @GetMapping("/profile/modifier")
+    @ResponseStatus(code = HttpStatus.OK)
     public String getProfileModifier(Model model, Authentication authentication) {
-        //return "redirect:/profile/modifier/password";
         UserDetails userDetails = getUserDetails(authentication);
 
         if (userDetails != null) {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
             if (utilisateur != null) {
                 UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
-                basicModelUserProfil(model, utilisateurDTO, true, false, false,false,null);
+                basicModelUserProfil(model, utilisateurDTO, true, false, false, false, null);
             }
         }
         return "profile";
     }
 
     @GetMapping("/profile/modifier/password")
+    @ResponseStatus(code = HttpStatus.OK)
     public String getProfileModifierPassword(Model model, Authentication authentication) {
         UserDetails userDetails = getUserDetails(authentication);
 
@@ -53,15 +61,11 @@ public class UtilisateurController {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
             if (utilisateur != null) {
                 UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
-                basicModelUserProfil(model, utilisateurDTO, true, true, false,false,null);
+                basicModelUserProfil(model, utilisateurDTO, true, true, false, false, null);
             }
         }
         return "profile";
     }
-
-
-
-
 
     @RequestMapping(value = "/profile/modifier/user", method = RequestMethod.POST)
     public String postModifierUtilisateur(@ModelAttribute(value = "utilisateurCourant") UtilisateurDTO utilisateur, Model model, Authentication authentication) {
@@ -108,14 +112,19 @@ public class UtilisateurController {
 
         }
 
-
-        if (utilisateur.getEmail() == null || utilisateur.getEmail().equals("") && !utilisateur.getEmail().contains("@")) {
+        if (utilisateur.getEmail() == null || utilisateur.getEmail().equals("") || !utilisateur.getEmail().contains("@")) {
             model.addAttribute("utilisateurCourant", utilisateurDTO);
             model.addAttribute("modifier", true);
             model.addAttribute("modifierPass", false);
             model.addAttribute("success", false);
             model.addAttribute("error", true);
             model.addAttribute("message", "L'addresse email n'est pas valide");
+            return "profile";
+        }
+
+        if (!calculateAge(utilisateur.getDateNaissance())) {
+
+            basicModelUserProfil(model, utilisateurDTO, true, false, false, true, "Vous devez être majeur pour vous inscrire");
             return "profile";
         }
 
@@ -133,7 +142,7 @@ public class UtilisateurController {
                 utilisateurAEnregistrer.setNom(utilisateurAEnregistrer.getNom());
             }
 
-            if(changedPassword) {
+            if (changedPassword) {
                 if (passwordConfirmer(utilisateur.getPassword(), utilisateur.getPasswordRepeat()) && !utilisateur.getPassword().equals("")) {
                     utilisateurAEnregistrer.setPassword(utilisateur.getPassword());
                 } else {
@@ -143,9 +152,9 @@ public class UtilisateurController {
 
             Utilisateur u;
 
-            if(utilisateur.getPassword() != null) {
+            if (utilisateur.getPassword() != null) {
                 u = utilisateurService.saveUser(utilisateurAEnregistrer);
-            }else {
+            } else {
                 u = utilisateurService.save(utilisateurAEnregistrer);
             }
 
@@ -158,20 +167,20 @@ public class UtilisateurController {
             model.addAttribute("modifierPass", false);
             model.addAttribute("success", false);
             model.addAttribute("error", true);
-            model.addAttribute("message", "Aucun données concernant l'utilisateur saisie...");
+            model.addAttribute("message", "Aucun données concernant l'utilisateur saisie");
             return "profile";
         }
 
     }
 
     private boolean passwordConfirmer(String password, String confirm) {
-        if(password != null && confirm != null) {
+        if (password != null && confirm != null) {
             return password.equals(confirm);
         }
         return false;
     }
 
-    public Model basicModelUserProfil(Model model,UtilisateurDTO utilisateurCourant, boolean modifier, boolean modifierPass,
+    public Model basicModelUserProfil(Model model, UtilisateurDTO utilisateurCourant, boolean modifier, boolean modifierPass,
                                       boolean success, boolean error, String message) {
         model.addAttribute("utilisateurCourant", utilisateurCourant);
         model.addAttribute("modifier", modifier);
@@ -183,7 +192,18 @@ public class UtilisateurController {
         return model;
     }
 
-    private UserDetails getUserDetails( Authentication authentication) {
+    private UserDetails getUserDetails(Authentication authentication) {
         return (UserDetails) authentication.getPrincipal();
+    }
+
+    public boolean calculateAge(Date dateNaissance) {
+        LocalDate localbirthDate = dateNaissance.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate localnowDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        if ((dateNaissance != null) && (localnowDate != null)) {
+            int age = Period.between(localbirthDate, localnowDate).getYears();
+            return age >= 18;
+        }
+        return false;
     }
 }
