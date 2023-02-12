@@ -16,6 +16,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,9 +25,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -36,6 +42,8 @@ import java.util.Collection;
 public class SecurityConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
     private final UtilisateurRepository utilisateurRepository;
+
+    private final HttpServletResponse httpServletResponse;
 
     private HttpSession session;
 
@@ -51,7 +59,7 @@ public class SecurityConfig {
         };
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .antMatchers("/", "/home", "/register").permitAll()
+                        .antMatchers("/", "/home", "/register", "/register/user").permitAll()
                         .antMatchers(staticResources).permitAll()
                         .anyRequest().authenticated()
                         .and()
@@ -64,11 +72,12 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout((logout) -> logout
-                        .logoutSuccessUrl("/logout")
+                        .logoutSuccessUrl("/login")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
+        http.csrf().disable();
 
         return http.build();
     }
@@ -97,8 +106,6 @@ public class SecurityConfig {
                 for (Role role : utilisateur.getRoles()) {
                     authorities.add(new SimpleGrantedAuthority(role.getLibelle()));
                 }
-                //session.setAttribute("userEmail", utilisateur.getEmail());
-                //request.setAttribute("userEmail", utilisateur.getEmail());
 
                 return new User(utilisateur.getEmail(), utilisateur.getPassword(), authorities);
             }

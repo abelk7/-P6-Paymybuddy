@@ -32,6 +32,14 @@
                     Vous avez été déconnecté
                 </div>
             </div>
+            <div class="alert alert-success d-flex align-items-center mt-3" role="alert" th:if="${successInscription}">
+                <svg aria-label="Success:" class="bi flex-shrink-0 me-2" height="24" role="img" width="24">
+                    <use xlink:href="#check-circle-fill"/>
+                </svg>
+                <div>
+                    Vous êtes maintenant enregistré, vous pouvez vous connecter
+                </div>
+            </div>
             <div class="card my-5">
                 <form class="card-body cardbody-color p-md-5 p-lg-5" method="post" th:action="@{/login}">
                     <div class="text-center">

@@ -61,6 +61,8 @@ public class UtilisateurController {
 
 
 
+
+
     @RequestMapping(value = "/profile/modifier/user", method = RequestMethod.POST)
     public String postModifierUtilisateur(@ModelAttribute(value = "utilisateurCourant") UtilisateurDTO utilisateur, Model model, Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -78,8 +80,6 @@ public class UtilisateurController {
             }
         }
 
-
-        //TODO : Vérifier le changement de chaque champs indivielllement....
         if (utilisateur.getPassword() != null && utilisateur.getPasswordRepeat() != null) {
             if (utilisateur.getPassword().length() >= 8) {
                 if (utilisateur.getPassword().equals(utilisateur.getPasswordRepeat())) {
@@ -119,7 +119,6 @@ public class UtilisateurController {
             return "profile";
         }
 
-        //TODO
         if (utilisateurRechercher != null) {
 
             Utilisateur utilisateurAEnregistrer = utilisateurService.getUser(userDetails.getUsername());
@@ -134,13 +133,22 @@ public class UtilisateurController {
                 utilisateurAEnregistrer.setNom(utilisateurAEnregistrer.getNom());
             }
 
-            if (passwordConfirmer(utilisateur.getPassword(), utilisateur.getPasswordRepeat()) && !utilisateur.getPassword().equals("")) {
-                utilisateurAEnregistrer.setPassword(utilisateur.getPassword());
-            } else {
-                utilisateurAEnregistrer.setPassword(utilisateurAEnregistrer.getPassword());
+            if(changedPassword) {
+                if (passwordConfirmer(utilisateur.getPassword(), utilisateur.getPasswordRepeat()) && !utilisateur.getPassword().equals("")) {
+                    utilisateurAEnregistrer.setPassword(utilisateur.getPassword());
+                } else {
+                    utilisateurAEnregistrer.setPassword(utilisateurAEnregistrer.getPassword());
+                }
             }
 
-            Utilisateur u = utilisateurService.saveUser(utilisateurAEnregistrer);
+            Utilisateur u;
+
+            if(utilisateur.getPassword() != null) {
+                u = utilisateurService.saveUser(utilisateurAEnregistrer);
+            }else {
+                u = utilisateurService.save(utilisateurAEnregistrer);
+            }
+
 
             utilisateurDTO = new UtilisateurDTO(utilisateur.getPrenom(), u.getNom(), u.getEmail(), null, null, u.getDateNaissance());
             return "redirect:/logout";
