@@ -25,14 +25,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -54,7 +47,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((requests) -> requests
                         .antMatchers("/", "/home", "/login", "/register", "/register/user").permitAll()
-                        .antMatchers("/profile", "/profile/modifier", "/profile/modifier/password", "/profile/modifier/user").hasAnyRole("USER", "ADMIN")
+                        .antMatchers("/profile", "/profile/modifier", "/profile/modifier/password", "/profile/modifier/user").hasAnyRole("USER","ADMIN")
+                        .antMatchers("/transfer/**").hasAnyRole("USER","ADMIN")
+                        .antMatchers("/connection/add/**").hasAnyRole("USER","ADMIN")
                         .antMatchers(staticResources).permitAll()
                         .anyRequest().authenticated()
                         .and()
@@ -86,12 +81,12 @@ public class SecurityConfig {
             @Override
             public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
                 Utilisateur utilisateur = utilisateurRepository.findByEmail(email);
-
+                System.out.println("EAMIL UTILISATEUR : " + utilisateur.getEmail());
                 if (utilisateur == null) {
                     LOG.error("L'utilisateur avec l'email : {} n'a pas été trouvé", email);
                     throw new UsernameNotFoundException("L'identifiant est incorrect");
                 }
-                LOG.info("L'utilisateur avec l'adresse email {} à été trouvé", email);
+                LOG.info("L'utilisateur avec l'adresse email {} à été trouvé", utilisateur.getEmail());
 
                 if (utilisateur.getRoles() == null || utilisateur.getRoles().isEmpty()) {
                     throw new RoleUserNotFoundException("Aucun role n'est assigné à l'utilisateur");
@@ -100,7 +95,7 @@ public class SecurityConfig {
                 Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
                 for (Role role : utilisateur.getRoles()) {
-                    authorities.add(new SimpleGrantedAuthority(role.getLibelle()));
+                    authorities.add(new SimpleGrantedAuthority("ROLE_"+role.getLibelle()));
                 }
 
                 return new User(utilisateur.getEmail(), utilisateur.getPassword(), authorities);

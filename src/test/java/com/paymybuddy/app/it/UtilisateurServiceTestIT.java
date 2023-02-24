@@ -4,6 +4,7 @@ import com.paymybuddy.app.model.Role;
 import com.paymybuddy.app.model.Utilisateur;
 import com.paymybuddy.app.service.IRoleService;
 import com.paymybuddy.app.service.IUtilisateurService;
+import lombok.RequiredArgsConstructor;
 import org.junit.Before;
 import org.junit.jupiter.api.*;
 import org.junit.platform.runner.JUnitPlatform;
@@ -28,22 +29,22 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @RunWith(JUnitPlatform.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+//TODO : ORDERCLASS
 public class UtilisateurServiceTestIT {
-
     @Autowired
     private IUtilisateurService utilisateurService;
     @Autowired
     private IRoleService roleService;
 
-    @DisplayName("Fetching user in database")
+    @DisplayName("1°) Fetching user in database")
     @Order(1)
     @Test
     void testGetUser() {
-        Utilisateur utilisateur = utilisateurService.getUser("user@user.com");
+        Utilisateur utilisateur = utilisateurService.getUser("user4@user.com");
         assertThat(utilisateur).isNotNull();
     }
 
-    @DisplayName("Fetching unexist user in database")
+    @DisplayName("2°) Fetching unexist user in database")
     @Order(2)
     @Test
     void testGetUserUnexistUser() {
@@ -51,7 +52,7 @@ public class UtilisateurServiceTestIT {
         assertThat(utilisateur).isNull();
     }
 
-    @DisplayName("Saving new user user")
+    @DisplayName("3°) Saving new user user")
     @Order(3)
     @Test
     void testSaveNewUser() {
@@ -73,7 +74,7 @@ public class UtilisateurServiceTestIT {
         assertThat(utilisateurSaved).isNotNull();
     }
 
-    @DisplayName("Saving user")
+    @DisplayName("4°) Saving user")
     @Order(4)
     @Test
     void testSaveUser() {

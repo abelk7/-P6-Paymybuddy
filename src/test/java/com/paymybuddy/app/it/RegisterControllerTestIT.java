@@ -2,6 +2,7 @@ package com.paymybuddy.app.it;
 
 import com.paymybuddy.app.payload.UtilisateurDTO;
 import com.paymybuddy.app.service.IUtilisateurService;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
@@ -23,9 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(JUnitPlatform.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@RequiredArgsConstructor
 public class RegisterControllerTestIT {
-    @Autowired
-    private WebApplicationContext context;
+    private final WebApplicationContext context;
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -36,7 +37,7 @@ public class RegisterControllerTestIT {
                 .build();
     }
 
-    @DisplayName("Tentative d'acceder à la page register")
+    @DisplayName("1°) Tentative d'acceder à la page register")
     @Order(1)
     @Test
     void testGetRegisterPage() throws Exception {
@@ -44,7 +45,7 @@ public class RegisterControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative d'inscrire un utilisateur avec informations correct")
+    @DisplayName("2°) Tentative d'inscrire un utilisateur avec informations correct")
     @Order(2)
     @Test
     void testRegisterUserWithValidInformation() throws Exception {
@@ -59,7 +60,7 @@ public class RegisterControllerTestIT {
                 .andExpect(status().isCreated());
     }
 
-    @DisplayName("Tentative d'inscrire un utilisateur avec champ prenom incorrect")
+    @DisplayName("3°) Tentative d'inscrire un utilisateur avec champ prenom incorrect")
     @Order(3)
     @Test
     void testRegisterUserWithInvalidPrenom() throws Exception {
@@ -76,7 +77,7 @@ public class RegisterControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative d'inscrire un utilisateur avec champ nom incorrect")
+    @DisplayName("4°) Tentative d'inscrire un utilisateur avec champ nom incorrect")
     @Order(4)
     @Test
     void testRegisterUserWithInvalidNom() throws Exception {
@@ -93,7 +94,7 @@ public class RegisterControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @DisplayName("5°) Tentative d'inscrire un utilisateur avec champ email incorrect")
     @Order(5)
     @Test
     void testRegisterUserWithInvalidEmail() throws Exception {
@@ -110,7 +111,7 @@ public class RegisterControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @DisplayName("6°) Tentative d'inscrire un utilisateur avec champ email incorrect")
     @Order(6)
     @Test
     void testRegisterUserWithInvalidPassword() throws Exception {
@@ -127,7 +128,7 @@ public class RegisterControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @DisplayName("7°) Tentative d'inscrire un utilisateur avec champ email incorrect")
     @Order(7)
     @Test
     void testRegisterUserWithInvalidPasswordLength() throws Exception {
@@ -144,7 +145,7 @@ public class RegisterControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @DisplayName("8°) Tentative d'inscrire un utilisateur avec champ email incorrect")
     @Order(8)
     @Test
     void testRegisterUserWithInvalidRepeatPassword() throws Exception {
@@ -161,7 +162,7 @@ public class RegisterControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative d'inscrire un utilisateur avec champ email incorrect")
+    @DisplayName("9°) Tentative d'inscrire un utilisateur avec champ email incorrect")
     @Order(9)
     @Test
     void testRegisterUserWithInvalidDateNaissance() throws Exception {

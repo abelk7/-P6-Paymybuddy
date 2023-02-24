@@ -12,6 +12,11 @@
 <div class="container-fluid">
     <div sec:authorize="isAuthenticated()">
         <div th:replace="fragments/header.html"/>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a th:href="@{/home}">Home</a></li>
+            </ol>
+        </nav>
         <div class="text-center mt-2">
             <h3>Bienvenue <span th:text="${utilisateurCourant.getPrenom()}" class="text-warning">title</span></h3>
         </div>

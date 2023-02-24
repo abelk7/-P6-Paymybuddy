@@ -13,10 +13,188 @@
 
     <div th:replace="fragments/header.html">
     </div>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/home}">Home</a></li>
+        <li class="breadcrumb-item active"><a th:href="@{/transfer}">Transfer</a></li>
+    </ol>
     <div class="container">
+        <div th:if="${addContact and !error and !transfer}">
+            <div class="alert alert-success d-flex align-items-center mt-3" role="alert">
+                <p th:text="${message}"></p>
+            </div>
+        </div>
+        <div th:if="${transfer and !addContact and !error}">
+            <div class="alert alert-success d-flex align-items-center mt-3" role="alert">
+                <p th:text="${message}"></p>
+            </div>
+        </div>
+        <div th:if="${error and !addContact and !transfer}">
+            <div class="alert alert-warning d-flex align-items-center mt-3" role="alert">
+                <p th:text="${message}"></p>
+            </div>
+        </div>
+        <div th:if="${transfer and error and !addContact}">
+            <div class="alert alert-warning d-flex align-items-center mt-3" role="alert">
+                <p th:text="${message}"></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="d-flex justify-content-between mt-5 mb-2">
+                <h2 style="font-size: 24px;">Send Money</h2>
+                <h4>Solde : <span class="badge bg-warning"><span th:text="${solde}"/> €</span></h4>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                    Add Connection
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Add Connection</h5>
+                                <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"
+                                        aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+
+                                <form method="post" th:action="@{/connection/add}">
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">Email address</label>
+                                        <input type="email" class="form-control" id="exampleInputEmail1" th:name="email"
+                                               aria-describedby="emailHelp" placeholder="Enter email">
+                                        <small id="emailHelp" class="form-text text-muted">Veuillez renseigner
+                                            l'addresse email d'un utilisateur pour le rajouter dans la liste des
+                                            contacts.</small>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="height: 130px;">
+            <div class="bg-light">
+                <form id="form1" class="form-inline " method="post" th:action="@{/transfer/pay}" th:object="${virementDTO}"
+                      style="margin-top:40px; ">
+                    <div class="row  justify-content-center">
+                        <select class="form-control custom-select" id="inlineFormCustomSelectPref"
+                                style="width: 250px;height: 40px;" th:field="*{utilisateurEmail}" th:onchange="getEmail(this.value)"
+                                placeholder="Select A Connection">
+                            <option value="">Sélectionner une connection</option>
+                            <option th:each="connection : ${listConnection}"
+                                    th:value="${connection.getConnectionUtilisateur().getEmail()}"
+                                    th:text="${connection.getConnectionUtilisateur().getPrenom()} +' '+${connection.getConnectionUtilisateur().getNom()}"></option>
+                        </select>
+                        <div  id="montantId" class="input-group mb-2 mr-sm-2" style="width: 150px;height: 40px;">
+                            <input type="number" class="form-control" id="inlineFormInputGroupUsername2" name="montant2" th:onchange="getMontant(this.value)"
+                                   th:field="*{montant}" th:value="0.00" th:min="0.00" th:max="${solde}">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text" style="height: 40px;">€</div>
+                            </div>
+                        </div>
+                        <input id="prodId" name="prodId" type="hidden" value="xm234jq">
+                        <button type="button" class="btn btn-success mb-3" style="width: 120px;height: 40px;"  data-toggle="modal" data-target="#exampleModal2">Pay
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog"
+                             aria-labelledby="exampleModalLabel2" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel2">Virement</h5>
+                                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"
+                                                aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+
+                                        <form id="form2" method="post" th:action="@{/connection/add}">
+                                            <div class="d-flex justify-content-start">
+                                                <div class="p-2">
+                                                    <p>Destinataire </p>
+                                                </div>
+                                                <div class="p-2">
+                                                    <input type="text" class="form-control-plaintext" id="virementId2" disabled style="margin-top: -7px;font-weight: bold"
+                                                           th:field="*{utilisateurEmail}" th:value="*{utilisateurEmail}" th:name="virement2">
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-start">
+                                                <div class="p-2">
+                                                    <p>Montant du virement</p>
+                                                </div>
+                                                <div class="p-2">
+                                                    <input type="text" class="form-control-plaintext" id="montantId2" disabled style="margin-top: -7px;font-weight: bold"
+                                                           th:field="*{montant}" th:value="*{montant}" th:name="montant2">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group my-2">
+                                                <div class="mb-3">
+                                                    <label for="exampleFormControlTextarea1" class="form-label">Libellé du virement</label>
+                                                    <textarea class="form-control" th:field="*{libelle}" th:value="*{libelle}" th:name="libelle2"
+                                                              id="exampleFormControlTextarea1" rows="3"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler
+                                                </button>
+                                                <button type="submit" class="btn btn-success">Effectuer le virement</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row my-4">
+            <h2 style="font-size: 24px;">My Transactions</h2>
+            <table class="table">
+                <thead class="bg-success text-white align-middle" style="height: 70px;">
+                <tr class="text-center">
+                    <th scope="col">Connections</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Amount</th>
+                </tr>
+                </thead>
+                <tbody th:each="transaction : ${listTransaction}">
+                <tr class="align-middle text-center" style="height: 70px;">
+                    <td th:text="${transaction.getCompteBeneficiaire().getUtilisateur().getPrenom()}"></td>
+                    <td th:text="${transaction.getLibelle()}"></td>
+                    <td><b><span th:text="${transaction.getMontant()}"></span>€</b></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
     </div>
 </div>
 <div th:replace="fragments/footer.html"/>
+<script type="text/javascript">
+    function getMontant(value) {
+        document.querySelector("#montantId2").value = value + "€";
+    }
+    function getEmail(value) {
+        document.querySelector("#virementId2").value = value;
+    }
+
+</script>
 </body>
 </html>

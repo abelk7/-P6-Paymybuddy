@@ -2,6 +2,7 @@ package com.paymybuddy.app.it;
 
 import com.paymybuddy.app.payload.UtilisateurDTO;
 import com.paymybuddy.app.service.IUtilisateurService;
+import lombok.RequiredArgsConstructor;
 import org.junit.Before;
 //import org.junit.Test;
 import org.junit.jupiter.api.*;
@@ -45,7 +46,7 @@ class ProfileControllerTestIT {
                 .build();
     }
 
-    @DisplayName("Tentative d'acceder à la page profile")
+    @DisplayName("1°) Tentative d'acceder à la page profile")
     @Order(1)
     @Test
     void testGetProfilePage() throws Exception {
@@ -54,7 +55,7 @@ class ProfileControllerTestIT {
                 .andExpect(status().isFound());
     }
 
-    @DisplayName("Tentative d'acceder à la page profile avec un utilisateur connecté")
+    @DisplayName("2°) Tentative d'acceder à la page profile avec un utilisateur connecté")
     @WithMockUser(username = "user@user.com", roles = "USER", password = "123456789")
     @Order(2)
     @Test
@@ -69,7 +70,7 @@ class ProfileControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative d'acceder au endpoint /profile/modifier sans utilisateur connecté")
+    @DisplayName("3°) Tentative d'acceder au endpoint /profile/modifier sans utilisateur connecté")
     @WithMockUser(username = "user@user.com", roles = "USER", password = "123456789")
     @Order(3)
     @Test
@@ -84,7 +85,7 @@ class ProfileControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative d'acceder au endpoint /profile/modifier/password (utilisateur connecté)")
+    @DisplayName("4°) Tentative d'acceder au endpoint /profile/modifier/password (utilisateur connecté)")
     @WithMockUser(username = "user2@user.com", roles = "USER", password = "123456789")
     @Order(4)
     @Test
@@ -99,7 +100,7 @@ class ProfileControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative de modifier password utilisateur avec fausse confirmaiton")
+    @DisplayName("5°) Tentative de modifier password utilisateur avec fausse confirmaiton")
     @WithMockUser(username = "user@user.com", roles = "USER", password = "123456789")
     @Order(5)
     @Test
@@ -121,7 +122,7 @@ class ProfileControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative de modifier password utilisateur avec taille incorrect")
+    @DisplayName("6°) Tentative de modifier password utilisateur avec taille incorrect")
     @WithMockUser(username = "user@user.com", roles = "USER", password = "123456789")
     @Order(6)
     @Test
@@ -143,7 +144,7 @@ class ProfileControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative de modifier email utilisateur avec email incorrect")
+    @DisplayName("7°) Tentative de modifier email utilisateur avec email incorrect")
     @WithMockUser(username = "user@user.com", roles = "USER", password = "123456789")
     @Order(7)
     @Test
@@ -168,7 +169,7 @@ class ProfileControllerTestIT {
     }
 
 
-    @DisplayName("Tentative de modifier utilisateur avec un âge utilisateur mineur")
+    @DisplayName("8°) Tentative de modifier utilisateur avec un âge utilisateur mineur")
     @WithMockUser(username = "user@user.com", roles = "USER", password = "123456789")
     @Order(8)
     @Test
@@ -192,7 +193,7 @@ class ProfileControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative de modifier un utilisateur inexistant")
+    @DisplayName("9°) Tentative de modifier un utilisateur inexistant")
     @WithMockUser(username = "user123456@user.com", roles = "USER", password = "123456789")
     @Order(9)
     @Test
@@ -208,7 +209,7 @@ class ProfileControllerTestIT {
         utilisateurDTO.setDateNaissance(Date.from(dateNaissance.atStartOfDay(defaultZoneId).toInstant()));
         mockMvc.perform(post("/profile/modifier/user").flashAttr("utilisateurCourant", utilisateurDTO))
                 .andExpect(model().attributeExists("utilisateurCourant"))
-                .andExpect(model().attribute("modifier", true))
+                .andExpect(model().attribute("modifier", false))
                 .andExpect(model().attribute("modifierPass", false))
                 .andExpect(model().attribute("success", false))
                 .andExpect(model().attribute("error", true))
@@ -216,7 +217,7 @@ class ProfileControllerTestIT {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Tentative de modifier un utilisateur avec information Correct sans changement password")
+    @DisplayName("10°) Tentative de modifier un utilisateur avec information Correct sans changement password")
     @WithMockUser(username = "user@user.com", roles = "USER", password = "123456789")
     @Order(10)
     @Test
@@ -241,7 +242,7 @@ class ProfileControllerTestIT {
                 .andExpect(status().isFound());
     }
 
-    @DisplayName("Tentative de modifier un utilisateur avec information Correct et changement de password")
+    @DisplayName("11°) Tentative de modifier un utilisateur avec information Correct et changement de password")
     @WithMockUser(username = "user2@user.com", roles = "USER", password = "123456789")
     @Order(11)
     @Test
