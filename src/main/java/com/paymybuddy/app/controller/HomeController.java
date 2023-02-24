@@ -1,6 +1,7 @@
 package com.paymybuddy.app.controller;
 
 import com.paymybuddy.app.model.Utilisateur;
+import com.paymybuddy.app.payload.UtilisateurDTO;
 import com.paymybuddy.app.service.IUtilisateurService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,11 @@ public class HomeController {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
             if (utilisateur != null) {
                 utilisateur.setPassword(null);
-                model.addAttribute("utilisateurCourant", utilisateur);
+                UtilisateurDTO utilisateurDTO= new UtilisateurDTO();
+                utilisateurDTO.setPrenom(utilisateur.getPrenom());
+                utilisateurDTO.setNom(utilisateur.getNom());
+                utilisateurDTO.setEmail(utilisateur.getEmail());
+                model.addAttribute("utilisateurCourant", utilisateurDTO);
             }
         }
         return "home";

@@ -31,6 +31,9 @@ public class Utilisateur {
     private Date dateInscription;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "utilisateur")
     private List<Connection> connections;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Compte compte;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "utilisateurs_roles",
@@ -38,4 +41,5 @@ public class Utilisateur {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<Role> roles;
+
 }

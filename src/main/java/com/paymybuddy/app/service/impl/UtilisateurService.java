@@ -3,6 +3,7 @@ package com.paymybuddy.app.service.impl;
 import com.paymybuddy.app.model.Utilisateur;
 import com.paymybuddy.app.repository.UtilisateurRepository;
 import com.paymybuddy.app.service.IUtilisateurService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ public class UtilisateurService implements IUtilisateurService {
     private final PasswordEncoder passwordEncoder;
     @Override
     public Utilisateur getUser(String email) {
-
+        LOG.info("Recherche de l'utilisateur {}  dans la base de donnée", email);
         return utilisateurRepository.findByEmail(email);
     }
     @Override
@@ -33,7 +34,7 @@ public class UtilisateurService implements IUtilisateurService {
 
     @Override
     public Utilisateur save(Utilisateur utilisateur) {
-        LOG.info("Enregistrement de l'utilisateur {} {} dans la base de donnée", utilisateur.getPrenom(), utilisateur.getNom());
+        LOG.info("Modification de l'utilisateur {} {} dans la base de donnée", utilisateur.getPrenom(), utilisateur.getNom());
         return utilisateurRepository.save(utilisateur);
     }
 }

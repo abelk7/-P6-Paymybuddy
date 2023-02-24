@@ -12,6 +12,12 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <div class="container-fluid">
     <div th:replace="fragments/header.html"/>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/home}">Home</a></li>
+            <li class="breadcrumb-item active"><a th:href="@{/profile}">Profile</a></li>
+        </ol>
+    </nav>
     <div class="container">
         <div style="width: 500px;margin:auto;">
             <div th:if="${error}" class="alert alert-warning d-flex align-items-center mt-3" role="alert">

@@ -17,7 +17,8 @@ public class Compte {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private BigDecimal solde;
-    @OneToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "utilisateur_id")
+
+    @OneToOne
     private Utilisateur utilisateur;
+
 }

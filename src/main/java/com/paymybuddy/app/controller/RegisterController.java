@@ -1,6 +1,7 @@
 package com.paymybuddy.app.controller;
 
 import com.google.common.base.Strings;
+import com.paymybuddy.app.model.Compte;
 import com.paymybuddy.app.model.Role;
 import com.paymybuddy.app.model.Utilisateur;
 import com.paymybuddy.app.payload.UtilisateurDTO;
@@ -13,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,12 +79,15 @@ public class RegisterController {
                     break;
                 }
             }
+
             Utilisateur newUser = new Utilisateur(
                     null,
                     utilisateur.getNom(), utilisateur.getPrenom(),
                     utilisateur.getEmail(), utilisateur.getPassword(),
-                    utilisateur.getDateNaissance(), new Date(), new ArrayList<>(), newUserRole
+                    utilisateur.getDateNaissance(), new Date(), new ArrayList<>(), null, newUserRole
             );
+            Compte newCompte = new Compte(null, BigDecimal.ZERO, newUser);
+            newUser.setCompte(newCompte);
 
             Utilisateur u = utilisateurService.saveUser(newUser);
             if (u == null) {

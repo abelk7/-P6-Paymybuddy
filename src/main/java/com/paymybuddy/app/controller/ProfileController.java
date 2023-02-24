@@ -31,7 +31,7 @@ public class ProfileController {
 
             if (utilisateur != null) {
                 UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
-                basicModelUserProfil(model, utilisateurDTO, false, false, false, false, null);
+                addModelAttributeProfil(model, utilisateurDTO, false, false, false, false, null);
             }
         }
         return "profile";
@@ -46,7 +46,7 @@ public class ProfileController {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
             if (utilisateur != null) {
                 UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
-                basicModelUserProfil(model, utilisateurDTO, true, false, false, false, null);
+                addModelAttributeProfil(model, utilisateurDTO, true, false, false, false, null);
             }
         }
         return "profile";
@@ -61,7 +61,7 @@ public class ProfileController {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
             if (utilisateur != null) {
                 UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
-                basicModelUserProfil(model, utilisateurDTO, true, true, false, false, null);
+                addModelAttributeProfil(model, utilisateurDTO, true, true, false, false, null);
             }
         }
         return "profile";
@@ -90,41 +90,26 @@ public class ProfileController {
                     changedPassword = true;
                 } else {
                     //Les mots de passe ne corresponds pas
-                    model.addAttribute("utilisateurCourant", utilisateurDTO);
-                    model.addAttribute("modifier", true);
-                    model.addAttribute("modifierPass", true);
-                    model.addAttribute("error", true);
-                    model.addAttribute("success", false);
-                    model.addAttribute("message", "Les mots de passe saisie ne sont pas identique");
+                    addModelAttributeProfil(model, utilisateurDTO, true, true, false, true, "Les mots de passe saisie ne sont pas identique");
                     return "profile";
                 }
 
             } else {
                 //Password inférieur à 8 caractère
-                model.addAttribute("utilisateurCourant", utilisateurDTO);
-                model.addAttribute("modifier", true);
-                model.addAttribute("modifierPass", true);
-                model.addAttribute("error", true);
-                model.addAttribute("success", false);
-                model.addAttribute("message", "Le mot de passe doit être supérieur ou égale à 8 caractères");
+                addModelAttributeProfil(model, utilisateurDTO, true, true, false, true, "Le mot de passe doit être supérieur ou égale à 8 caractères");
                 return "profile";
             }
 
         }
 
         if (utilisateur.getEmail() == null || utilisateur.getEmail().equals("") || !utilisateur.getEmail().contains("@")) {
-            model.addAttribute("utilisateurCourant", utilisateurDTO);
-            model.addAttribute("modifier", true);
-            model.addAttribute("modifierPass", false);
-            model.addAttribute("success", false);
-            model.addAttribute("error", true);
-            model.addAttribute("message", "L'addresse email n'est pas valide");
+            addModelAttributeProfil(model, utilisateurDTO, true, false, false, true, "L'addresse email n'est pas valide");
             return "profile";
         }
 
         if (!calculateAge(utilisateur.getDateNaissance())) {
 
-            basicModelUserProfil(model, utilisateurDTO, true, false, false, true, "Vous devez être majeur pour vous inscrire");
+            addModelAttributeProfil(model, utilisateurDTO, true, false, false, true, "Vous devez être majeur pour vous inscrire");
             return "profile";
         }
 
@@ -162,12 +147,7 @@ public class ProfileController {
             utilisateurDTO = new UtilisateurDTO(utilisateur.getPrenom(), u.getNom(), u.getEmail(), null, null, u.getDateNaissance());
             return "redirect:/logout";
         } else {
-            model.addAttribute("utilisateurCourant", utilisateurDTO);
-            model.addAttribute("modifier", true);
-            model.addAttribute("modifierPass", false);
-            model.addAttribute("success", false);
-            model.addAttribute("error", true);
-            model.addAttribute("message", "Aucun données concernant l'utilisateur saisie");
+            addModelAttributeProfil(model, utilisateurDTO, false, false, false, true, "Aucun données concernant l'utilisateur saisie");
             return "profile";
         }
 
@@ -180,8 +160,8 @@ public class ProfileController {
         return false;
     }
 
-    public Model basicModelUserProfil(Model model, UtilisateurDTO utilisateurCourant, boolean modifier, boolean modifierPass,
-                                      boolean success, boolean error, String message) {
+    public Model addModelAttributeProfil(Model model, UtilisateurDTO utilisateurCourant, boolean modifier, boolean modifierPass,
+                                         boolean success, boolean error, String message) {
         model.addAttribute("utilisateurCourant", utilisateurCourant);
         model.addAttribute("modifier", modifier);
         model.addAttribute("modifierPass", modifierPass);
@@ -206,4 +186,5 @@ public class ProfileController {
         }
         return false;
     }
+
 }

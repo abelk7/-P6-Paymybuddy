@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Entity
 @Data
@@ -17,7 +18,8 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private BigDecimal montant;
-    private String description;
+    private String libelle;
+    private Date date;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "typetransaction_id")
     private TypeTransaction typeTransaction;
