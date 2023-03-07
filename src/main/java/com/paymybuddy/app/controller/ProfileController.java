@@ -25,15 +25,18 @@ public class ProfileController {
     @ResponseStatus(code = HttpStatus.OK)
     public String getProfilePage(Model model, Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UtilisateurDTO utilisateurDTO;
 
         if (userDetails != null) {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
 
             if (utilisateur != null) {
-                UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
+                utilisateurDTO = new UtilisateurDTO(utilisateur);
                 addModelAttributeProfil(model, utilisateurDTO, false, false, false, false, null);
             }
         }
+        utilisateurDTO = new UtilisateurDTO();
+        addModelAttributeProfil(model, utilisateurDTO, false, false, false, false, null);
         return "profile";
     }
 
@@ -41,14 +44,17 @@ public class ProfileController {
     @ResponseStatus(code = HttpStatus.OK)
     public String getProfileModifier(Model model, Authentication authentication) {
         UserDetails userDetails = getUserDetails(authentication);
+        UtilisateurDTO utilisateurDTO;
 
         if (userDetails != null) {
             Utilisateur utilisateur = utilisateurService.getUser(userDetails.getUsername());
             if (utilisateur != null) {
-                UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
+                utilisateurDTO = new UtilisateurDTO(utilisateur);
                 addModelAttributeProfil(model, utilisateurDTO, true, false, false, false, null);
             }
         }
+        utilisateurDTO = new UtilisateurDTO();
+        addModelAttributeProfil(model, utilisateurDTO, false, false, false, false, null);
         return "profile";
     }
 
@@ -68,6 +74,7 @@ public class ProfileController {
     }
 
     @RequestMapping(value = "/profile/modifier/user", method = RequestMethod.POST)
+    @ResponseStatus(code = HttpStatus.OK)
     public String postModifierUtilisateur(@ModelAttribute(value = "utilisateurCourant") UtilisateurDTO utilisateur, Model model, Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
@@ -75,7 +82,7 @@ public class ProfileController {
         boolean changedPassword = false;
 
         if (userDetails != null) {
-            utilisateurRechercher = utilisateurService.getUser(userDetails.getUsername());
+            utilisateurRechercher = utilisateurService.getUserConnected(authentication);
             if (utilisateurRechercher != null) {
                 utilisateurDTO.setNom(utilisateurRechercher.getNom());
                 utilisateurDTO.setPrenom(utilisateurRechercher.getPrenom());
@@ -84,23 +91,7 @@ public class ProfileController {
             }
         }
 
-        if (utilisateur.getPassword() != null && utilisateur.getPasswordRepeat() != null) {
-            if (utilisateur.getPassword().length() >= 8) {
-                if (utilisateur.getPassword().equals(utilisateur.getPasswordRepeat())) {
-                    changedPassword = true;
-                } else {
-                    //Les mots de passe ne corresponds pas
-                    addModelAttributeProfil(model, utilisateurDTO, true, true, false, true, "Les mots de passe saisie ne sont pas identique");
-                    return "profile";
-                }
 
-            } else {
-                //Password inférieur à 8 caractère
-                addModelAttributeProfil(model, utilisateurDTO, true, true, false, true, "Le mot de passe doit être supérieur ou égale à 8 caractères");
-                return "profile";
-            }
-
-        }
 
         if (utilisateur.getEmail() == null || utilisateur.getEmail().equals("") || !utilisateur.getEmail().contains("@")) {
             addModelAttributeProfil(model, utilisateurDTO, true, false, false, true, "L'addresse email n'est pas valide");
@@ -115,7 +106,7 @@ public class ProfileController {
 
         if (utilisateurRechercher != null) {
 
-            Utilisateur utilisateurAEnregistrer = utilisateurService.getUser(userDetails.getUsername());
+            Utilisateur utilisateurAEnregistrer = utilisateurService.getUserConnected(authentication);
             if (!utilisateur.getEmail().equals(utilisateurAEnregistrer.getPrenom())) {
                 utilisateurAEnregistrer.setEmail(utilisateur.getEmail());
             }
@@ -127,25 +118,50 @@ public class ProfileController {
                 utilisateurAEnregistrer.setNom(utilisateurAEnregistrer.getNom());
             }
 
-            if (changedPassword) {
-                if (passwordConfirmer(utilisateur.getPassword(), utilisateur.getPasswordRepeat()) && !utilisateur.getPassword().equals("")) {
-                    utilisateurAEnregistrer.setPassword(utilisateur.getPassword());
+            if (utilisateur.getPassword() != null && utilisateur.getPasswordRepeat() != null) {
+                if (utilisateur.getPassword().length() >= 8) {
+                    if (utilisateur.getPassword().equals(utilisateur.getPasswordRepeat())) {
+
+                            if (passwordConfirmer(utilisateur.getPassword(), utilisateur.getPasswordRepeat()) && !utilisateur.getPassword().equals("")) {
+                                utilisateurAEnregistrer.setPassword(utilisateur.getPassword());
+                                changedPassword = true;
+
+                            } else {
+                                utilisateurAEnregistrer.setPassword(utilisateurAEnregistrer.getPassword());
+                            }
+
+                    } else {
+                        //Les mots de passe ne corresponds pas
+                        addModelAttributeProfil(model, utilisateurDTO, true, true, false, true, "Les mots de passe saisie ne sont pas identique");
+                        return "profile";
+                    }
+
                 } else {
-                    utilisateurAEnregistrer.setPassword(utilisateurAEnregistrer.getPassword());
+                    //Password inférieur à 8 caractère
+                    addModelAttributeProfil(model, utilisateurDTO, true, true, false, true, "Le mot de passe doit être supérieur ou égale à 8 caractères");
+                    return "profile";
                 }
+
             }
 
-            Utilisateur u;
 
-            if (utilisateur.getPassword() != null) {
+
+
+            Utilisateur u;
+            if (changedPassword) {
                 u = utilisateurService.saveUser(utilisateurAEnregistrer);
             } else {
                 u = utilisateurService.save(utilisateurAEnregistrer);
             }
 
+            if(u != null) {
+                return "redirect:/logout";
+            }else {
+                addModelAttributeProfil(model, utilisateurDTO, false, false, false, true, "Une erreur est survenu lors de la tentative d'enregistrement des données");
+                return "profile";
+            }
 
-            utilisateurDTO = new UtilisateurDTO(utilisateur.getPrenom(), u.getNom(), u.getEmail(), null, null, u.getDateNaissance());
-            return "redirect:/logout";
+
         } else {
             addModelAttributeProfil(model, utilisateurDTO, false, false, false, true, "Aucun données concernant l'utilisateur saisie");
             return "profile";
