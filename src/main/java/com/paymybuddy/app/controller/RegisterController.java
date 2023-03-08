@@ -51,7 +51,7 @@ public class RegisterController {
                 return "register";
             }
             if (Strings.isNullOrEmpty(utilisateur.getEmail()) || !utilisateur.getEmail().contains("@")) {
-                modelRegistrationError(model, "L'addresse email n'est pas valide", utilisateur);
+                modelRegistrationError(model, "L'adresse email n'est pas valide", utilisateur);
                 return "register";
             }
             if (Strings.isNullOrEmpty(utilisateur.getPassword())) {
@@ -99,7 +99,8 @@ public class RegisterController {
             return "login";
 
         }
-        return "";
+        modelRegistrationError(model, "Une erreur est survenue lors de l'enregistrement du nouveau utilisateur, veuillez vérifier les informations saisie", utilisateur);
+        return "register";
     }
 
     private Model modelRegistrationError(Model model, String message, UtilisateurDTO utilisateur) {
